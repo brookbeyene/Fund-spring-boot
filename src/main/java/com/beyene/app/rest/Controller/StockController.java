@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -31,7 +32,7 @@ public class StockController {
         this.stockRepository = stockRepository;
     }
     @GetMapping(value = "/")
-    public String welcomePage() throws URISyntaxException {
+    public Map welcomePage() throws URISyntaxException {
         ObjectMapper mapper = new ObjectMapper();
        this.stocks = "Welcome";
         try{
@@ -43,13 +44,13 @@ public class StockController {
                 this.stocks = br.readLine();
                 Map<String,Object> map = mapper.readValue(this.stocks, Map.class);
                 this.stockMap = map;
-//                System.out.println(map);
+                
             }
         } catch (Exception e){
             System.out.println(e);
         }
 
-        return this.stocks;
+        return this.stockMap;
     }
 
 
@@ -63,10 +64,11 @@ public class StockController {
     public ResponseEntity saveStock(@RequestBody Stock stock){
     return ResponseEntity.ok(this.stockRepository.save(stock));
     }
-    @GetMapping ("mapper")
-    public Map getStockMap(){
-
-        return (Map) this.stockMap.get("0");
+    @GetMapping ("/mapper/{id}")
+    public Map getStockMap(@PathVariable long id){
+        String ids = String.valueOf(id);
+        Map some = (Map) this.stockMap.get(ids);
+        return (Map) some.get("etf");
     }
 
     @PutMapping(value = "/update/{id}")
